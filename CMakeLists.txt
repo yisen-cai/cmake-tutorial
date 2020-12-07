@@ -1,48 +1,44 @@
 cmake_minimum_required(VERSION 3.17)
-project(static-library)
+
+project(condition-compilation)
 
 # set variables
 set(CMAKE_CXX_STANDARD 14)
 
+set(USE_LIBRARY ON)
 
-# obj can be used to compile the sources in the list given to `add_library` to object files
-# The use of libraries particularly useful if one need to create both static and shared libraries in one go.
-add_library(
-    message-objs
-    OBJECT
+message(STATUS "Compile sources into a library? ${USE_LIBRARY}")
+
+# defined in cmake, calling add_library and omitting the second argument will build a static library
+set(BUILD_SHARED_LIBS OFF)
+
+
+# listing message.h and message.cpp
+# introduce a variable _sources
+list(
+    APPEND
+    _sources
 
     src/message.h
     src/message.cpp
+)
+
+if(USE_LIBRARY)
+    add_library(
+        message
+
+        ${_sources}
     )
 
-# this is only needed for older compilers
-# but doesn't hurt either to have it
-set_target_properties(
-    message-objs
-    PROPERTIES
-    POSITION_INDEPENDENT_CODE 1
-)
+    message(STATUS "Build with static library")
 
-# Libraries that can be linked dynamically and loaded at runtime.
-add_library(
-    message-shared
-    SHARED
-    $<TARGET_OBJECTS:message-objs>
-)
+    add_executable(condition-compilation  src/main.cpp)
 
-# Used to create static libraries, archives of object files for used when linking other targets(executables).
-add_library(
-    message-static
-    STATIC
-    $<TARGET_OBJECTS:message-objs>
-)
+    target_link_libraries(condition-compilation message )
 
+else()
+    message(STATUS "Build without static library")
+    # else not use static library
+    add_executable(condition-compilation src/main.cpp ${_sources})
 
-
-# MODULE libraries are one again DSOs, are not linked to any other target withen the project, but may be loaded dynamically later on.
-
-
-
-add_executable(hello-world src/main.cpp)
-
-target_link_libraries(hello-world message-static)
+endif(USE_LIBRARY)
