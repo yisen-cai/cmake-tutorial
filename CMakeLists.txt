@@ -5,7 +5,27 @@ project(condition-compilation)
 # set variables
 set(CMAKE_CXX_STANDARD 14)
 
-set(USE_LIBRARY ON)
+# use option(<option_variable> "help string" [initial value])
+# set variable outside by option method
+option(USE_LIBRARY "Compile sources into a library? " OFF)
+
+# second option depends on the value of the first
+cmake_dependent_option(
+    MAKE_STATIC_LIBRARY
+    "Compile sources into a static library"
+    OFF
+    "USE_LIBRARY"
+    ON
+)
+
+# third option depends on the value of the first
+cmake_dependent_option(
+    MAKE_SHARED_LIBRARY
+    "Compile sources into a shared library"
+    ON
+    "USE_LIBRARY"
+    ON
+)
 
 message(STATUS "Compile sources into a library? ${USE_LIBRARY}")
 
@@ -22,6 +42,17 @@ list(
     src/message.h
     src/message.cpp
 )
+
+if(MAKE_SHARED_LIBRARY)
+
+    message(STATUS "Make shared library")
+    add_library(
+        message-shared
+        SHARED
+
+        ${_sources}
+    )
+endif(MAKE_SHARED_LIBRARY)
 
 if(USE_LIBRARY)
     add_library(
