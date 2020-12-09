@@ -1,36 +1,19 @@
 cmake_minimum_required(VERSION 3.17)
 
-project(condition-compilation)
+project(build-type)
 
 # set variables
 set(CMAKE_CXX_STANDARD 14)
 
-# use option(<option_variable> "help string" [initial value])
-# set variable outside by option method
-option(USE_LIBRARY "Compile sources into a library? " OFF)
 
-# second option depends on the value of the first
-cmake_dependent_option(
-    MAKE_STATIC_LIBRARY
-    "Compile sources into a static library"
-    OFF
-    "USE_LIBRARY"
-    ON
-)
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE Release CACHE STRING "Build type" FORCE)
+endif()
 
-# third option depends on the value of the first
-cmake_dependent_option(
-    MAKE_SHARED_LIBRARY
-    "Compile sources into a shared library"
-    ON
-    "USE_LIBRARY"
-    ON
-)
-
-message(STATUS "Compile sources into a library? ${USE_LIBRARY}")
-
-# defined in cmake, calling add_library and omitting the second argument will build a static library
-set(BUILD_SHARED_LIBS OFF)
+message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
+message(STATUS "C flags, Debug configuration: ${CMAKE_C_FLAGS_DEBUG}")
+message(STATUS "C flags, Release configuration: ${CMAKE_C_FLAGS_RELEASE}")
+message(STATUS "C flags, Release configuration with Debug info: ${CMAKE_C_FLAGS_RELWITHDEBIFO}")
 
 
 # listing message.h and message.cpp

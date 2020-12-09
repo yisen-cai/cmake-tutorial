@@ -1,2 +1,8 @@
 .vscode/
 build/
+*.iml
+.idea/
+cmake-build-debug/
+.vs/
+*.pdb
+*.obj
